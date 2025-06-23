@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerai Digital - Langganan Streaming Jadi Mudah</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===================================================================
+           CSS RATE CARD v7.0 - TEMA NETFLIX
+           =================================================================== */
+
+        /* -------------------------------------------------------------------
+           1. PENGATURAN DASAR & VARIABEL WARNA
+           ------------------------------------------------------------------- */
+        :root {
+            --bg-dark: #121212;
+            --bg-card: #1A1A1A;
+            --bg-card-popular: #212121;
+            --accent-primary: #E50914; /* Merah Netflix - Warna ini tetap untuk asosiasi produk */
+            --accent-confirm: #00E0C7; 
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --border-color: #282828;
+            --header-height: 80px;
+            --border-radius: 8px;
+            --padding-card: clamp(1.5rem, 5vw, 2.2rem);
+            --padding-container-y: clamp(2.5rem, 8vw, 5rem);
+            --padding-container-x: clamp(1rem, 5vw, 2rem);
+         }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-secondary); margin: 0; font-size: 16px; line-height: 1.6; }
+        body.no-scroll { overflow: hidden; }
+
+        /* -------------------------------------------------------------------
+           2. NAVIGASI
+           ------------------------------------------------------------------- */
+        .main-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: var(--header-height);
+            padding: 0 var(--padding-container-x);
+            background-color: rgba(18, 18, 18, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .logo { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.5rem; color: var(--text-primary); text-decoration: none; letter-spacing: 0.5px; }
+        .logo img { height: 40px; width: auto; border-radius: 4px; }
+        
+        .nav-links { display: none; list-style: none; margin: 0; padding: 0; gap: 2rem; }
+        .nav-links a { color: var(--text-secondary); text-decoration: none; font-weight: 500; transition: color 0.3s ease; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-primary); }
+        
+        .hamburger-menu { display: flex; flex-direction: column; justify-content: space-around; width: 30px; height: 24px; background: transparent; border: none; cursor: pointer; padding: 0; z-index: 1001; }
+        .hamburger-menu .line { display: block; width: 100%; height: 3px; background-color: var(--text-primary); border-radius: 3px; transition: all 0.3s ease-in-out; }
+        .hamburger-menu.is-active .line1 { transform: translateY(10.5px) rotate(45deg); }
+        .hamburger-menu.is-active .line2 { opacity: 0; }
+        .hamburger-menu.is-active .line3 { transform: translateY(-10.5px) rotate(-45deg); }
+        
+        .mobile-nav { 
+            position: fixed; 
+            top: 0; right: -100%; 
+            width: 80%;
+            max-width: 340px; 
+            height: 100vh; 
+            background-color: var(--bg-card); 
+            z-index: 1000; 
+            transition: right 0.4s ease-in-out; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-start;
+            align-items: stretch;
+            padding: calc(var(--header-height)) 0 2rem;
+        }
+        .mobile-nav.is-active { right: 0; box-shadow: -10px 0 30px rgba(0,0,0,0.2); }
+        
+        .mobile-nav ul { list-style: none; padding: 0 1.5rem; margin: 0; }
+        .mobile-nav ul li { margin: 0.5rem 0; border-bottom: 1px solid var(--border-color); }
+        .mobile-nav ul li:first-child { border-top: 1px solid var(--border-color); }
+        .mobile-nav ul a { color: var(--text-secondary); text-decoration: none; font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 16px; padding: 1rem 1.2rem; border-radius: 0; transition: all 0.25s ease; }
+        .mobile-nav ul a:hover, .mobile-nav ul a:focus { background-color: var(--bg-dark); color: var(--text-primary); transform: translateX(10px); }
+        .mobile-nav ul a svg { width: 22px; height: 22px; color: var(--accent-primary); transition: color 0.25s ease; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s ease; }
+        .overlay.is-active { opacity: 1; visibility: visible; }
+        
+        .date-display-mobile {
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .date-display-desktop {
+            display: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.9rem;
+            align-self: center;
+            margin-right: 2rem;
+        }
+
+        .nav-right-group {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) { 
+            .mobile-nav { display: none; } 
+            .overlay { display: none; }
+            .date-display-desktop { display: block; }
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 var(--padding-container-x); }
+        section[id] { scroll-margin-top: var(--header-height); }
+        
+        .section-title { text-align: center; margin-bottom: clamp(3rem, 10vw, 4rem); font-size: clamp(2rem, 1rem + 4vw, 3rem); color: var(--text-primary); }
+        .section-subtitle { text-align: center; font-size: 1.5rem; color: var(--text-primary); margin-top: clamp(4rem, 12vw, 6rem); margin-bottom: -1rem; font-weight: 700; }
+        div[id] { scroll-margin-top: var(--header-height); }
+        
+        .rate-card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: clamp(1.5rem, 4vw, 2.5rem); align-items: stretch; }
+        .rate-card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: var(--padding-card); display: flex; flex-direction: column; transition: all 0.3s ease; }
+        .rate-card:hover, .rate-card:focus-within { transform: translateY(-10px); box-shadow: 0 10px 45px rgba(229, 9, 20, 0.15); }
+        .rate-card h3 { font-size: 1.6rem; font-weight: 700; color: var(--accent-primary); margin: 0 0 0.5rem 0; }
+        .card-desc { font-size: 0.95rem; margin-bottom: 1.5rem; min-height: 50px; flex-grow: 0; }
+        .rate-card .price { font-size: clamp(2.5rem, 1rem + 7vw, 3.5rem); font-weight: 800; margin: 0.5rem 0 1.5rem 0; line-height: 1; color: var(--text-primary); }
+        .rate-card .price-note { font-size: 0.9rem; color: var(--text-secondary); display: block; margin-top: -1rem; margin-bottom: 1.5rem; }
+        .rate-card ul { list-style: none; padding: 0; margin: 0 0 2rem 0; text-align: left; flex-grow: 1; }
+        .rate-card ul li { display: flex; align-items: flex-start; gap: 12px; padding: 0.75rem 0; font-size: 1rem; border-bottom: 1px solid var(--border-color); }
+        .rate-card ul li:last-child { border-bottom: none; }
+        .rate-card ul li span { color: var(--text-primary); font-weight: 500; }
+        .icon-check { color: var(--accent-primary); margin-top: 5px; flex-shrink: 0; }
+        .icon-cross { color: #5A6978; margin-top: 5px; flex-shrink: 0; }
+        .rate-card.popular { border: 2px solid var(--accent-primary); background-color: var(--bg-card-popular); box-shadow: 0 0 50px rgba(229, 9, 20, 0.2); position: relative; }
+        .rate-card.popular .badge { position: absolute; top: 20px; right: 20px; background: var(--accent-primary); color: var(--text-primary); padding: 4px 12px; font-size: 0.75rem; font-weight: 700; border-radius: 20px; text-transform: uppercase; }
+        .cta-button { display: inline-block; width: auto; text-align: center; background: var(--accent-primary); color: var(--text-primary); padding: 1rem 2rem; border-radius: var(--border-radius); text-decoration: none; font-weight: 700; transition: all 0.25s ease; border: 2px solid var(--accent-primary); margin-top: auto; }
+        .cta-button:hover, .cta-button:focus-visible { background: #B20710; border-color: #B20710; transform: translateY(-3px); box-shadow: 0 4px 10px rgba(229, 9, 20, 0.2); }
+        .cta-button:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 4px; }
+        
+        #services, #about, #contact { 
+            padding-top: var(--padding-container-y); 
+            padding-bottom: var(--padding-container-y);
+        }
+        
+        @media (min-width: 992px) {
+            .rate-card.popular { transform: translateY(-15px); }
+            .rate-card.popular:hover, .rate-card.popular:focus-within { transform: translateY(-20px); box-shadow: 0 0 60px rgba(229, 9, 20, 0.35); }
+        }
+        
+        .about-content { max-width: 800px; margin: 0 auto; text-align: left; }
+        .about-content h3 { color: var(--text-primary); font-size: 1.5rem; margin-top: 3rem; margin-bottom: 1.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color); }
+        .about-content p, .about-content ul li { text-align: left; }
+        .about-content ul { list-style: none; padding-left: 0; }
+        .about-content ul li { display: flex; align-items: flex-start; gap: 15px; padding: 10px 0; font-size: 1.05rem; }
+        .about-content ul li::before { content: '🎬'; color: var(--accent-primary); margin-right: 5px; flex-shrink: 0; }
+        .about-content blockquote { 
+            border-left: 4px solid var(--accent-primary); 
+            background-color: rgba(229, 9, 20, 0.05); 
+            padding: 1rem 1.5rem; 
+            margin: 2rem 0; 
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .about-content blockquote.is-hiding {
+            opacity: 0;
+        }
+
+        #home {
+            padding-top: calc(var(--header-height) + var(--padding-container-y));
+            padding-bottom: 0;
+            text-align: center;
+        }
+
+        .hero-section { padding-bottom: var(--padding-container-y); text-align: center; }
+        .hero-content { max-width: 800px; margin: 0 auto; }
+
+        .hero-section h1 {
+            font-size: clamp(2.8rem, 1rem + 8vw, 4.5rem);
+            color: var(--text-primary);
+            line-height: 1.1;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.05em;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 0.5rem + 1.2vw, 1.3rem);
+            max-width: 650px;
+            margin: 0 auto 2.5rem auto;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .hero-buttons { display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .hero-buttons .cta-button { min-width: 200px; }
+        .rate-card .cta-button { width: 100%; }
+
+        .feature-highlights-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            padding: clamp(3rem, 10vw, 5rem) 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: clamp(2rem, 8vw, 4rem);
+        }
+
+        .feature-highlight { text-align: center; background-color: var(--bg-card); padding: 2rem 1.5rem; border-radius: var(--border-radius); border: 1px solid transparent; transition: all 0.3s ease; }
+        .feature-highlight:hover { transform: translateY(-8px); border-color: var(--border-color); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+        .feature-icon { display: inline-flex; justify-content: center; align-items: center; width: 60px; height: 60px; border-radius: 50%; background: var(--accent-primary); color: var(--text-primary); margin-bottom: 1.5rem; box-shadow: 0 0 20px rgba(229, 9, 20, 0.3); }
+        .feature-highlight h3 { font-size: 1.25rem; color: var(--text-primary); margin-bottom: 0.75rem; }
+        .feature-highlight p { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; }
+
+        footer { text-align: center; margin-top: clamp(4rem, 12vw, 6rem); padding: 2rem var(--padding-container-x); border-top: 1px solid var(--border-color); }
+        footer a { color: var(--accent-primary); font-weight: 600; text-decoration: none; transition: color 0.2s ease; }
+        footer a:hover, footer a:focus-visible { color: var(--accent-confirm); text-decoration: underline; }
+        .footer-links { margin-bottom: 1.5rem; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+        .footer-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; }
+        .footer-links a:hover { color: var(--text-primary); }
+        .copyright { color: #5A6978; font-size: 0.875rem; margin-top: 1.5rem; }
+    </style>
+</head>
+<body>
+
+    <nav class="main-nav">
+        <a href="#home" class="logo">
+            <img src="geraidigital.png" alt="Profil Logo">
+            <span>GERAI DIGITAL</span>
+        </a>
+        
+        <div class="nav-right-group">
+            <ul class="nav-links">
+                <li><a href="#home">HOME</a></li>
+                <li><a href="#services">DAFTAR HARGA</a></li>
+                <li><a href="#about">FAQ</a></li>
+            </ul>
+        </div>
+        <button class="hamburger-menu" aria-label="Buka menu">
+            <span class="line line1"></span><span class="line line2"></span><span class="line line3"></span>
+        </button>
+    </nav>
+    <div class="mobile-nav">
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#harga-harian">Daftar Harga Harian</a></li>
+            <li><a href="#harga-mingguan">Daftar Harga Mingguan</a></li>
+            <li><a href="#harga-bulanan">Daftar Harga Bulanan</a></li>
+            <li><a href="#about">Tanya Jawab (FAQ)</a></li>
+        </ul>
+    </div>
+    <div class="overlay"></div>
+    
+    <div class="container">
+       <section id="home">
+            <div class="hero-section">
+                <div class="hero-content">
+                    <h1>Film, Acara TV Tak Terbatas, dan Banyak Lagi</h1>
+                    <p class="hero-subtitle">
+                        Tonton di mana pun. Batalkan kapan pun. Siap menonton? Gulir ke bawah untuk memilih paket langganan Netflix Anda.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#services" class="cta-button">Lihat Paket Langganan</a>
+                    </div>
+                </div>
+            </div>
+            <div class="feature-highlights-container">
+                <div class="feature-highlight">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-tv" viewBox="0 0 16 16"><path d="M2.5 13.5A.5.5 0 0 1 3 13h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zM13.991 3H2c-.325 0-.502.078-.601.145a.758.758 0 0 0-.254.288A1.493 1.493 0 0 0 1 4.01V11c0 .325.078.502.145.601.07.068.16.145.288.254.116.1.25.166.417.185A1.49 1.49 0 0 0 2 12h12c.325 0 .502-.078.601-.145a.758.758 0 0 0 .254-.288A1.493 1.493 0 0 0 15 11.01V4c0-.325-.078-.502-.145-.601a.758.758 0 0 0-.254-.288A1.493 1.493 0 0 0 13.991 3zM14 11.01c0 .04-.01.071-.023.102a.498.498 0 0 1-.16.193c-.044.026-.094.04-.158.04H2.34c-.064 0-.114-.014-.158-.04a.498.498 0 0 1-.16-.193c-.012-.03-.022-.062-.022-.102V4.01c0-.04.01-.071.023-.102a.498.498 0 0 1 .16-.193c.044-.026.094.04.158-.04h11.32c.064 0 .114.014.158.04a.498.498 0 0 1 .16.193c.012.03.022.062.022.102V11.01z"/></svg>
+                    </div>
+                    <h3>Tonton di Perangkat Apapun</h3>
+                    <p>Streaming di ponsel, tablet, laptop, dan TV Anda tanpa biaya tambahan.</p>
+                </div>
+                <div class="feature-highlight">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                    </div>
+                    <h3>Download & Tonton Offline</h3>
+                    <p>Simpan tontonan favoritmu dengan mudah dan tonton di mana saja tanpa koneksi internet.</p>
+                </div>
+                <div class="feature-highlight">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-person-hearts" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.5 1.246c.832-.855 2.913.642 0 2.566-2.913-1.924-.832-3.421 0-2.566zM6 3.5a.5.5 0 0 1 .5.5v1.5H8a.5.5 0 0 1 0 1H6.5V8a.5.5 0 0 1-1 0V6.5H4a.5.5 0 0 1 0-1h1.5V4a.5.5 0 0 1 .5-.5z"/><path d="M8 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm7 8s-1-4-5-4-5 4-5 4h10zm-9.995-.944v-.002.002zM3.022 13h9.956a.274.274 0 0 0 .014-.002l.008-.002c-.001-.246-.154-.986-.832-1.954C11.423 9.873 9.575 9 8 9c-1.575 0-3.424.873-4.168 1.994-.678.968-.83 1.708-.832 1.954a.274.274 0 0 0 .022.004z"/></svg>
+                    </div>
+                    <h3>Profil Khusus Anak</h3>
+                    <p>Hadirkan petualangan seru untuk anak-anak dengan tontonan ramah keluarga di profil khusus mereka.</p>
+                </div>
+            </div>
+       </section>
+
+        <main>
+            <section id="services">
+                <h2 class="section-title">Pilih Paket Langganan Netflix</h2>
+
+                <div id="harga-harian">
+                    <h2 class="section-subtitle">Paket Harian</h2>
+                    <div class="rate-card-container" style="padding-top: 3rem;">
+                        <div class="rate-card">
+                            <h3>Netflix 5 Hari</h3>
+                            <p class="card-desc">Resolusi 144p, hanya untuk 1 HP. Tidak mendukung TV/Laptop.</p>
+                            <div class="price">Rp 5rb</div>
+                            <span class="price-note">/5 hari</span>
+                            <ul>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>Kualitas Video Basic (144p)</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>1 Perangkat Handphone</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-x-circle icon-cross" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg><span>Support TV & Laptop</span></li>
+                            </ul>
+                            <a href="#contact" class="cta-button">Pilih Paket</a>
+                        </div>
+                         <div class="rate-card">
+                            <h3>Netflix 10 Hari</h3>
+                            <p class="card-desc">Resolusi 240p, untuk 2 perangkat HP dan TV.</p>
+                            <div class="price">Rp 10rb</div>
+                            <span class="price-note">/10 hari</span>
+                            <ul>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>Kualitas Video Cukup (240p)</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>2 Perangkat (HP & TV)</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-x-circle icon-cross" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg><span>Support Laptop</span></li>
+                            </ul>
+                            <a href="#contact" class="cta-button">Pilih Paket</a>
+                        </div>
+                        <div class="rate-card">
+                            <h3>Netflix 15 Hari</h3>
+                            <p class="card-desc">Resolusi 360p, untuk 3 perangkat HP, Laptop, dan TV.</p>
+                            <div class="price">Rp 20rb</div>
+                            <span class="price-note">/15 hari</span>
+                            <ul>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>Kualitas Video Standard (360p)</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>3 Perangkat (HP, Laptop, TV)</span></li>
+                            </ul>
+                            <a href="#contact" class="cta-button">Pilih Paket</a>
+                        </div>
+                         <div class="rate-card">
+                            <h3>Netflix 20 Hari</h3>
+                            <p class="card-desc">Resolusi 480p, untuk 4 perangkat HP, Laptop, dan TV.</p>
+                            <div class="price">Rp 25rb</div>
+                            <span class="price-note">/20 hari</span>
+                            <ul>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>Kualitas Video Baik (480p)</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>4 Perangkat (HP, Laptop, TV)</span></li>
+                            </ul>
+                            <a href="#contact" class="cta-button">Pilih Paket</a>
+                        </div>
+                        <div class="rate-card">
+                            <h3>Netflix 25 Hari</h3>
+                            <p class="card-desc">Resolusi 720p, untuk 4 perangkat HP, Laptop, dan TV.</p>
+                            <div class="price">Rp 30rb</div>
+                            <span class="price-note">/25 hari</span>
+                            <ul>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>Kualitas Video Lumayan (720p)</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>4 Perangkat (HP, Laptop, TV)</span></li>
+                            </ul>
+                            <a href="#contact" class="cta-button">Pilih Paket</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="harga-mingguan">
+                    <h2 class="section-subtitle">Paket Mingguan</h2>
+                    <div class="rate-card-container" style="padding-top: 3rem;">
+                         <div class="rate-card">
+                            <h3>Netflix 1 Minggu</h3>
+                            <p class="card-desc">Resolusi 144p, hanya untuk 1 HP. Tidak mendukung TV/Laptop.</p>
+                            <div class="price">Rp 20rb</div>
+                            <span class="price-note">/minggu</span>
+                            <ul>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>Kualitas Video Basic (144p)</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>1 Perangkat Handphone</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-x-circle icon-cross" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg><span>Support TV & Laptop</span></li>
+                            </ul>
+                            <a href="#contact" class="cta-button">Pilih Paket</a>
+                        </div>
+                        <div class="rate-card">
+                            <h3>Netflix 2 Minggu</h3>
+                            <p class="card-desc">Resolusi 240p, untuk 2 perangkat HP dan TV.</p>
+                            <div class="price">Rp 25rb</div>
+                            <span class="price-note">/2 minggu</span>
+                            <ul>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>Kualitas Video Cukup (240p)</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>2 Perangkat (HP & TV)</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-x-circle icon-cross" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg><span>Support Laptop</span></li>
+                            </ul>
+                            <a href="#contact" class="cta-button">Pilih Paket</a>
+                        </div>
+                        <div class="rate-card">
+                            <h3>Netflix 3 Minggu</h3>
+                            <p class="card-desc">Resolusi 360p, untuk 3 perangkat HP, Laptop, dan TV.</p>
+                            <div class="price">Rp 35rb</div>
+                            <span class="price-note">/3 minggu</span>
+                            <ul>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>Kualitas Video Standard (360p)</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>3 Perangkat (HP, Laptop, TV)</span></li>
+                            </ul>
+                            <a href="#contact" class="cta-button">Pilih Paket</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="harga-bulanan">
+                    <h2 class="section-subtitle">Paket Bulanan</h2>
+                    <div class="rate-card-container" style="padding-top: 3rem;">
+                        <div class="rate-card">
+                            <h3>Ponsel Bulanan</h3>
+                            <p class="card-desc">Paket paling hemat untuk 1 Handphone, resolusi 144p.</p>
+                            <div class="price">Rp 35rb</div>
+                            <span class="price-note">/bulan</span>
+                            <ul>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>Kualitas Video Basic (144p)</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>1 Perangkat Handphone</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-x-circle icon-cross" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg><span>Support TV & Laptop</span></li>
+                            </ul>
+                            <a href="#contact" class="cta-button">Pilih Paket</a>
+                        </div>
+                        
+                        <div class="rate-card">
+                            <h3>Basic Bulanan</h3>
+                            <p class="card-desc">Tonton di Handphone dan TV dengan kualitas 360p.</p>
+                            <div class="price">Rp 45rb</div>
+                            <span class="price-note">/bulan</span>
+                            <ul>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>Kualitas Video Standard (360p)</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>Support Handphone & TV</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-x-circle icon-cross" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg><span>Support Laptop</span></li>
+                            </ul>
+                            <a href="#contact" class="cta-button">Pilih Paket</a>
+                        </div>
+
+                        <div class="rate-card popular">
+                            <div class="badge">Terlaris</div>
+                            <h3>Standar Bulanan</h3>
+                            <p class="card-desc">Resolusi 480p untuk 3 perangkat sekaligus. Cocok untuk bersama.</p>
+                            <div class="price">Rp 50rb</div>
+                            <span class="price-note">/bulan</span>
+                            <ul>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>Kualitas Video Baik (480p)</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>3 Perangkat (HP, Laptop, TV)</span></li>
+                            </ul>
+                            <a href="#contact" class="cta-button">Pilih Paket</a>
+                        </div>
+                        
+                        <div class="rate-card">
+                            <h3>Premium HD</h3>
+                            <p class="card-desc">Kualitas HD 720p untuk 4 perangkat sekaligus. Jernih dan tajam.</p>
+                            <div class="price">Rp 55rb</div>
+                            <span class="price-note">/bulan</span>
+                            <ul>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>Kualitas Video HD (720p)</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>4 Perangkat (HP, Laptop, TV)</span></li>
+                            </ul>
+                            <a href="#contact" class="cta-button">Pilih Paket</a>
+                        </div>
+                        <div class="rate-card">
+                            <h3>Premium Full HD</h3>
+                            <p class="card-desc">Pengalaman terbaik dengan kualitas Full HD 1080p di 4 perangkat.</p>
+                            <div class="price">Rp 60rb</div>
+                            <span class="price-note">/bulan</span>
+                            <ul>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>Kualitas Video Hebat (1080p)</span></li>
+                                <li><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-check-circle-fill icon-check" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/></svg><span>4 Perangkat (HP, Laptop, TV)</span></li>
+                            </ul>
+                            <a href="#contact" class="cta-button">Pilih Paket</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="about">
+                <h2 class="section-title">Tanya Jawab</h2>
+                <div class="about-content">
+                    <h3>Apa itu Netflix?</h3>
+                    <p>Netflix adalah layanan streaming yang menawarkan berbagai acara TV pemenang penghargaan, film, anime, dokumenter, dan banyak lagi di ribuan perangkat yang terhubung ke Internet.</p>
+                    <p>Anda dapat menonton sepuasnya, kapan pun Anda mau, tanpa satu iklan pun—semuanya dengan satu harga bulanan yang murah. Selalu ada tontonan baru untuk ditemukan, dan acara TV serta film baru ditambahkan setiap minggu!</p>
+
+                    <blockquote id="dynamic-quote">Siap menonton? Pilih paket di atas dan klik 'Pesan Sekarang' untuk melanjutkan via WhatsApp.</blockquote>
+
+                    <h3>Di mana saya bisa menonton?</h3>
+                    <p>Tonton di mana saja, kapan saja. Masuk dengan akun Netflix Anda untuk menonton langsung di netflix.com dari komputer pribadi atau di perangkat apa pun yang terhubung ke Internet yang menawarkan aplikasi Netflix, termasuk smart TV, smartphone, tablet, pemutar media streaming, dan konsol game.</p>
+                    
+                    <h3>Bagaimana cara membatalkannya?</h3>
+                    <ul>
+                        <li>Netflix itu fleksibel. Tidak ada kontrak sial atau komitmen.</li>
+                        <li>Anda dapat dengan mudah membatalkan akun Anda secara online dalam dua klik.</li>
+                        <li>Tidak ada biaya pembatalan – mulai atau hentikan akun Anda kapan saja.</li>
+                    </ul>
+                </div>
+            </section>           
+        </main>
+
+        <footer>
+            <p class="copyright">&copy; 2025 Gerai Digital. Halaman ini adalah agen penjualan dan tidak berafiliasi secara resmi dengan Netflix, Inc. - Made by: Studioofficialridho - All Right Reserved</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileNavContainer = document.querySelector('.mobile-nav');
+            const navRightGroup = document.querySelector('.nav-right-group');
+
+            function displayDate() {
+                const now = new Date();
+                const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                const dayName = days[now.getDay()];
+                const date = now.getDate();
+                const monthName = months[now.getMonth()];
+                const year = now.getFullYear();
+                const formattedDate = `${dayName}, ${date} ${monthName} ${year}`;
+                
+                const mobileDateElement = document.createElement('div');
+                mobileDateElement.className = 'date-display-mobile';
+                mobileDateElement.textContent = formattedDate;
+                mobileNavContainer.prepend(mobileDateElement);
+
+                const desktopDateElement = document.createElement('div');
+                desktopDateElement.className = 'date-display-desktop';
+                desktopDateElement.textContent = formattedDate;
+                navRightGroup.prepend(desktopDateElement);
+            }
+            displayDate();
+
+            const hamburger = document.querySelector('.hamburger-menu');
+            const overlay = document.querySelector('.overlay');
+            const body = document.querySelector('body');
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav ul a');
+
+            function toggleMenu() {
+                hamburger.classList.toggle('is-active');
+                mobileNavContainer.classList.toggle('is-active');
+                overlay.classList.toggle('is-active');
+                body.classList.toggle('no-scroll');
+            }
+
+            hamburger.addEventListener('click', toggleMenu);
+            overlay.addEventListener('click', toggleMenu);
+
+            mobileNavLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (mobileNavContainer.classList.contains('is-active')) {
+                        toggleMenu();
+                    }
+                });
+            });
+
+            const createIcon = (path) => {
+                const svgNS = "http://www.w3.org/2000/svg";
+                const svg = document.createElementNS(svgNS, 'svg');
+                svg.setAttribute('width', '16');
+                svg.setAttribute('height', '16');
+                svg.setAttribute('fill', 'currentColor');
+                svg.setAttribute('viewBox', '0 0 16 16');
+                const svgPath = document.createElementNS(svgNS, 'path');
+                svgPath.setAttribute('d', path);
+                svg.appendChild(svgPath);
+                return svg;
+            };
+            
+            const iconMap = {
+                '#home': 'M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.5v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5z',
+                '#harga-harian': 'M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zM16 14V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2zM8.5 7.5h1v1h-1v-1z',
+                '#harga-mingguan':'M11 6.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm-5 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3 0a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1z',
+                '#harga-bulanan': 'M1 2.5A1.5 1.5 0 0 1 2.5 1h11A1.5 1.5 0 0 1 15 2.5v11a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 13.5v-11zM2.5 2a.5.5 0 0 0-.5.5v11a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-11a.5.5 0 0 0-.5-.5h-11z',
+                '#about': 'M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z',
+            };
+            
+            mobileNavLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (iconMap[href]) {
+                    const icon = createIcon(iconMap[href]);
+                    link.prepend(icon);
+                }
+            });
+
+            const ctaButtons = document.querySelectorAll('.rate-card .cta-button');
+            const waPhoneNumber = '6283136270490'; 
+
+            ctaButtons.forEach(button => {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault(); 
+                    const isReadyToOrder = this.classList.contains('ready-to-order');
+                    if (isReadyToOrder) {
+                        const card = this.closest('.rate-card');
+                        const packageName = card.querySelector('h3').textContent.trim();
+                        const packagePrice = card.querySelector('.price').textContent.trim();
+                        const packageNote = card.querySelector('.price-note').textContent.trim();
+                        const featureItems = card.querySelectorAll('ul li');
+                        let featuresListString = '';
+                        featureItems.forEach(item => {
+                            const featureText = item.querySelector('span').textContent.trim();
+                            const icon = item.querySelector('svg');
+                            if (icon && icon.classList.contains('icon-check')) {
+                                featuresListString += `✅ ${featureText}\n`;
+                            }
+                        });
+                        const message = `Halo, saya tertarik untuk berlangganan Netflix.\n\nBerikut detail paket yang saya pilih:\n\nPaket : *${packageName}*\nHarga : *${packagePrice}${packageNote}*\n\n--- *FITUR TERMASUK* ---\n${featuresListString.trim()}\n---------------------------\n\nMohon informasinya untuk langkah selanjutnya. Terima kasih.`;
+                        const whatsappUrl = `https://api.whatsapp.com/send?phone=${waPhoneNumber}&text=${encodeURIComponent(message)}`;
+                        window.open(whatsappUrl, '_blank');
+                    } else {
+                        document.querySelectorAll('.rate-card .cta-button').forEach(btn => {
+                            btn.textContent = 'Pilih Paket';
+                            btn.classList.remove('ready-to-order');
+                            btn.style.backgroundColor = '';
+                            btn.style.borderColor = '';
+                            btn.style.color = '';
+                        });
+                        this.textContent = 'Pesan Sekarang';
+                        this.classList.add('ready-to-order');
+                        this.style.backgroundColor = 'var(--accent-confirm)';
+                        this.style.borderColor = 'var(--accent-confirm)';
+                        this.style.color = 'var(--bg-dark)';
+                    }
+                });
+            });
+
+            const quoteElement = document.getElementById('dynamic-quote');
+            const quoteTexts = [
+                "Siap menonton? Pilih paket di atas dan klik 'Pesan Sekarang' untuk melanjutkan via WhatsApp.",
+                "Pilih paket langganan Anda dan hubungi kami langsung di WhatsApp untuk aktivasi cepat.",
+                "Hanya satu klik lagi untuk menikmati ribuan film. Lanjutkan pemesanan via WhatsApp.",
+                "Sudah menemukan paket yang cocok? Klik 'Pesan Sekarang' pada paket pilihanmu untuk memesan."
+            ];
+            let currentQuoteIndex = 0;
+            if (quoteElement) {
+                setInterval(() => {
+                    quoteElement.classList.add('is-hiding');
+                    setTimeout(() => {
+                        currentQuoteIndex = (currentQuoteIndex + 1) % quoteTexts.length;
+                        quoteElement.textContent = quoteTexts[currentQuoteIndex];
+                        quoteElement.classList.remove('is-hiding');
+                    }, 500);
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+</html>
